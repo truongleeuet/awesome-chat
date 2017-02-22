@@ -1,20 +1,29 @@
 var io = require('socket.io');
 
 exports.initialize = function(server) {
-    io = io listen(server);
+    io = io.listen(server);
     io.sockets.on("connection", (socket) => {
-        socket.send(JSON.stringify({
-            type: 'serverMessage',
-            message: 'Welcome to the most interesting chat room on earth!'
-         }));
+        console.log('Client connection');
 
-        soclet.on('message', (message) => {
-            message = JSON.parse(message);
+        socket.on('message', (message) => {
+            // message = JSON.parse(message);
+            console.log(message);
             if (message.type == "userMessage") {
-                socket.broadcast.send(JSON.stringify(message));
+                socket.broadcast.send(message);
                 message.type = "myMessage";
-                socket.send(JSON.stringify(message));
+                socket.emit('message', message);
             }
+        });
+
+        socket.on('set_name', (data) => {
+            console.log(data);
+            // socket.set('nickname', data.name, () => {
+                socket.emit('name_set', data);
+                socket.emit('message', {
+                    type: 'serverMessage',
+                    message: 'Welcome to the most interesting chat room on earth!'
+                });
+            // })
         })
     })
 }
